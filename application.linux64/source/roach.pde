@@ -1,4 +1,6 @@
 /*
+The full license (GPL) can be found in the folder "data".
+
 Copyright (C) 2014 Birger Schulze
 
 This program is free software: you can redistribute it and/or modify

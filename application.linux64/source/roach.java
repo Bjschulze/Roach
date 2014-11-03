@@ -1,4 +1,24 @@
+import processing.core.*; 
+import processing.data.*; 
+import processing.event.*; 
+import processing.opengl.*; 
+
+import java.awt.Point; 
+
+import java.util.HashMap; 
+import java.util.ArrayList; 
+import java.io.File; 
+import java.io.BufferedReader; 
+import java.io.PrintWriter; 
+import java.io.InputStream; 
+import java.io.OutputStream; 
+import java.io.IOException; 
+
+public class roach extends PApplet {
+
 /*
+The full license (GPL) can be found in the folder "data".
+
 Copyright (C) 2014 Birger Schulze
 
 This program is free software: you can redistribute it and/or modify
@@ -15,7 +35,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-import java.awt.Point;
+
 
 float direction = 0;
 float xPos = 0;
@@ -42,7 +62,7 @@ float difficulty = 100;
 
 ArrayList<Point> squished;
 
-void setup() {
+public void setup() {
   squished = new ArrayList<Point>();
   scrDiag = scrHeight*scrWidth/2;
   size(scrWidth, scrHeight);
@@ -58,10 +78,10 @@ void setup() {
   cursor(CROSS);
 }
 
-void draw() {
+public void draw() {
   background(bgColor);
-  text("Roaches squished: " + squished.size(), 0.0, 10.0);
-  text("Difficulty: " + difficulty/100, 0.0, 22.0);
+  text("Roaches squished: " + squished.size(), 0.0f, 10.0f);
+  text("Difficulty: " + difficulty/100, 0.0f, 22.0f);
   noStroke();
   fill(255, 0, 0);
   for (Point p : squished) {
@@ -81,11 +101,11 @@ void draw() {
   pushMatrix();
 }
 
-boolean outOfScreen() {
+public boolean outOfScreen() {
   return !(xPos >= 0 && xPos <= scrWidth && yPos >= 0 && yPos <= scrHeight);
 }
 
-float updateDirection() {
+public float updateDirection() {
   float diff = random(-20, 20);
   if (outOfScreen()) {
     diff = 180;
@@ -94,17 +114,17 @@ float updateDirection() {
   return diff;
 }
 
-float updateDistance() {
+public float updateDistance() {
   oldDistance = distance;
   distance = dist(mouseX, mouseY, xPos, yPos);
   return abs(oldDistance - distance);
 }
 
-float updateBoost() {
-  return boost = 0.5+1/(distance/difficulty);
+public float updateBoost() {
+  return boost = 0.5f+1/(distance/difficulty);
 }
 
-void mousePressed() {
+public void mousePressed() {
   if (mouseButton == RIGHT) {
     difficulty += (difficulty + 100 <= maxDifficulty)?100:0;
   } else if (mouseButton == CENTER) {
@@ -117,14 +137,23 @@ void mousePressed() {
   }
 }
 
-boolean mouseInCircle(float x, float y, float radius) {
+public boolean mouseInCircle(float x, float y, float radius) {
   return dist(x, y, mouseX, mouseY) <= radius;
 }
 
-void replace() {
+public void replace() {
   popMatrix();
   resetMatrix();
   translate(random(width), random(height));
   rotate(random(radians(360)));
   pushMatrix();
+}
+  static public void main(String[] passedArgs) {
+    String[] appletArgs = new String[] { "roach" };
+    if (passedArgs != null) {
+      PApplet.main(concat(appletArgs, passedArgs));
+    } else {
+      PApplet.main(appletArgs);
+    }
+  }
 }
