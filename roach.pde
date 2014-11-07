@@ -15,7 +15,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-import java.awt.Point;
 
 float direction = 0;
 float xPos = 0;
@@ -40,10 +39,10 @@ float oldDistance = 0;
 float maxDifficulty = 1000;
 float difficulty = 100;
 
-ArrayList<Point> squished;
+ArrayList<PVector> squished;
 
 void setup() {
-  squished = new ArrayList<Point>();
+  squished = new ArrayList<PVector>();
   scrDiag = scrHeight*scrWidth/2;
   size(scrWidth, scrHeight);
   background(bgColor);
@@ -64,8 +63,8 @@ void draw() {
   text("Difficulty: " + difficulty/100, 0.0, 22.0);
   noStroke();
   fill(255, 0, 0);
-  for (Point p : squished) {
-    image(blood, (float)p.getX(), (float)p.getY(), imageHeight, imageHeight);
+  for (PVector p : squished) {
+    image(blood, (float)p.x, (float)p.y, imageHeight, imageHeight);
   }
   popMatrix();
   float movement = -1*speed*((boost <= maxBoost)?boost:maxBoost);
@@ -111,7 +110,7 @@ void mousePressed() {
     replace();
   } else {
     if (mouseInCircle(xPos, yPos, 50)) {
-      squished.add(new Point((int)xPos, (int)yPos));
+      squished.add(new PVector(xPos, yPos));
       replace();
     }
   }
