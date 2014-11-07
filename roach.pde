@@ -15,13 +15,26 @@ Copyright (C) 2014 Birger Schulze
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  
  */
- 
- /*
+
+/*
  TODO:
- - Calibration of the speed formula
+ 
  */
-float difficulty = 1000;
-final float maxDifficulty = 10000;
+
+
+int scrWidth = 640;
+int scrHeight = 480;
+int scrDiag = 0;
+PVector center;
+PImage blood;
+String roachImage = "kakerlake.png";
+String bloodImage = "blutfleck.png";
+int bgColor = 255;
+float fps = 30;
+int aaLevel = 8;
+
+float difficulty = 1;
+final float maxDifficulty = 10;
 final float maxSpeed = 20;
 float imageWidth, imageHeight;
 
@@ -44,8 +57,12 @@ class Bug {
     replace();
   }
 
-  boolean outOfScreen() {
+  private boolean outOfScreen() {
     return !(xPos >= 0 && xPos <= width && yPos >= 0 && yPos <= height);
+  }
+
+  private boolean isStuck(float tolerance) {
+    return !(xPos >= -tolerance && xPos <= width+tolerance && yPos >= -tolerance && yPos <= height+tolerance);
   }
 
   void update() {
@@ -57,8 +74,16 @@ class Bug {
     yPos = screenY(0, 0);
     float distance = dist(mouseX, mouseY, xPos, yPos);
     float newSpeed = speedFormula(distance);
-    speed = (newSpeed <= maxSpeed)?newSpeed:maxSpeed;
-    direction += radians((this.outOfScreen())?180:random(-20, 20));
+    speed = 1.5* ((newSpeed <= maxSpeed)?newSpeed:maxSpeed);
+    //direction += radians((this.outOfScreen())?180:random(-20, 20));
+    if (this.outOfScreen()) {
+      if (isStuck(30)) {
+        println("Stuck!");
+        replace();
+      }
+      direction += radians(180);
+    } else
+      direction += radians(random(-20, 20));
   }
 
   void display() {
@@ -69,7 +94,7 @@ class Bug {
   }
 
   private float speedFormula(float dist) {
-    return difficulty/100+1/(dist/difficulty);
+    return 1+1/(dist/(difficulty*100));
   }
 
   boolean hit() {
@@ -78,20 +103,13 @@ class Bug {
 
   void replace() {
     resetMatrix();
-    translate(random(width), random(height));
+    xPos = random(width);
+    yPos = random(height);
+    //translate(random(width), random(height));
     direction = random(TWO_PI);
   }
 }
 
-int scrWidth = 640;
-int scrHeight = 480;
-int scrDiag = 0;
-PImage blood;
-String roachImage = "kakerlake.png";
-String bloodImage = "blutfleck.png";
-int bgColor = 255;
-float fps = 30;
-int aaLevel = 8;
 
 Bug testBug;
 
@@ -100,6 +118,7 @@ ArrayList<PVector> squished;
 void setup() {
   squished = new ArrayList<PVector>();
   scrDiag = scrHeight*scrWidth/2;
+  center = new PVector(width/2, height/2);
   size(scrWidth, scrHeight);
   background(bgColor);
   blood = loadImage(bloodImage);
@@ -114,7 +133,7 @@ void draw() {
   background(bgColor);
   fill(0);
   text("Roaches squished: " + squished.size(), 0.0, 10.0);
-  text("Difficulty: " + difficulty/100, 0.0, 22.0);
+  text("Difficulty: " + difficulty, 0.0, 22.0);
   noStroke();
   fill(255, 0, 0);
   for (PVector p : squished) {
@@ -126,7 +145,7 @@ void draw() {
 
 void mousePressed() {
   if (mouseButton == RIGHT) {
-    difficulty += (difficulty + 100 <= maxDifficulty)?1000:0;
+    difficulty += (difficulty + 1 <= maxDifficulty)?1:0;
   } else if (mouseButton == CENTER) {
   } else {
   }
@@ -135,3 +154,4 @@ void mousePressed() {
 boolean mouseInCircle(float x, float y, float radius) {
   return dist(x, y, mouseX, mouseY) <= radius;
 }
+
