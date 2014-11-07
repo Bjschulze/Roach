@@ -44,17 +44,23 @@ class Bug {
   float speed = 2;
   float direction = 0;
 
-  Bug(float x, float y, String imageName) {
-    this(x, y, imageName, 20, 40);
+  Bug(String imageName) {
+    this(imageName, 20, 40);
   }
 
-  Bug(float x, float y, String imageName, float w, float h) {
-    xPos = x;
-    yPos = y;
+  Bug(String imageName, float w, float h) {
     sprite = loadImage(imageName);
     imageWidth = w;
     imageHeight = h;
     replace();
+  }
+
+  float getX() {
+    return xPos;
+  }
+
+  float getY() {
+    return yPos;
   }
 
   private boolean outOfScreen() {
@@ -75,7 +81,6 @@ class Bug {
     float distance = dist(mouseX, mouseY, xPos, yPos);
     float newSpeed = speedFormula(distance);
     speed = 1.5* ((newSpeed <= maxSpeed)?newSpeed:maxSpeed);
-    //direction += radians((this.outOfScreen())?180:random(-20, 20));
     if (this.outOfScreen()) {
       if (isStuck(30)) {
         println("Stuck!");
@@ -105,27 +110,27 @@ class Bug {
     resetMatrix();
     xPos = random(width);
     yPos = random(height);
-    //translate(random(width), random(height));
     direction = random(TWO_PI);
   }
 }
 
-
-Bug testBug;
-
 ArrayList<PVector> squished;
+ArrayList<Bug> active;
 
 void setup() {
-  squished = new ArrayList<PVector>();
+  size(scrWidth, scrHeight);
   scrDiag = scrHeight*scrWidth/2;
   center = new PVector(width/2, height/2);
-  size(scrWidth, scrHeight);
+  squished = new ArrayList<PVector>();
+  active = new ArrayList<Bug>();
+  active.add(new Bug(roachImage));
+  active.add(new Bug(roachImage));
+  active.add(new Bug(roachImage));
+  active.add(new Bug(roachImage));
   background(bgColor);
   blood = loadImage(bloodImage);
   imageMode(CENTER);
-  testBug = new Bug(100, 100, roachImage);
   frameRate(fps);
-  pushMatrix();
   cursor(CROSS);
 }
 
@@ -139,8 +144,10 @@ void draw() {
   for (PVector p : squished) {
     image(blood, (float)p.x, (float)p.y, imageHeight, imageHeight);
   }
-  testBug.update();
-  testBug.display();
+  for (Bug b : active) {
+    b.update();
+    b.display();
+  }
 }
 
 void mousePressed() {
@@ -148,6 +155,13 @@ void mousePressed() {
     difficulty += (difficulty + 1 <= maxDifficulty)?1:0;
   } else if (mouseButton == CENTER) {
   } else {
+    for (int i = 0; i < active.size (); i++) {
+      if (active.get(i).hit()) {
+        squished.add(new PVector(active.get(i).getX(), active.get(i).getY()));
+        //println("hit");
+        active.remove(i);
+      }
+    }
   }
 }
 
