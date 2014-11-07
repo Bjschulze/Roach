@@ -27,11 +27,12 @@ int scrHeight = 480;
 int scrDiag = 0;
 PVector center;
 PImage blood;
+PImage roach;
 String roachImage = "kakerlake.png";
 String bloodImage = "blutfleck.png";
 int bgColor = 255;
-float fps = 30;
-int aaLevel = 8;
+float fps = 60;
+int aaLevel = 4;
 
 float difficulty = 1;
 final float maxDifficulty = 10;
@@ -44,14 +45,13 @@ class Bug {
   float speed = 2;
   float direction = 0;
 
-  Bug(String imageName) {
-    this(imageName, 20, 40);
+  Bug(PImage image) {
+    sprite = image;
+    replace();
   }
 
-  Bug(String imageName, float w, float h) {
+  Bug(String imageName) {
     sprite = loadImage(imageName);
-    imageWidth = w;
-    imageHeight = h;
     replace();
   }
 
@@ -80,7 +80,7 @@ class Bug {
     yPos = screenY(0, 0);
     float distance = dist(mouseX, mouseY, xPos, yPos);
     float newSpeed = speedFormula(distance);
-    speed = 1.5* ((newSpeed <= maxSpeed)?newSpeed:maxSpeed);
+    speed = ((newSpeed <= maxSpeed)?newSpeed:maxSpeed);
     if (this.outOfScreen()) {
       if (isStuck(30)) {
         println("Stuck!");
@@ -107,7 +107,7 @@ class Bug {
   }
 
   void replace() {
-    resetMatrix();
+    //resetMatrix();
     xPos = random(width);
     yPos = random(height);
     direction = random(TWO_PI);
@@ -118,18 +118,21 @@ ArrayList<PVector> squished;
 ArrayList<Bug> active;
 
 void setup() {
+  imageWidth = 20;
+  imageHeight = 40;
   size(scrWidth, scrHeight);
   scrDiag = scrHeight*scrWidth/2;
   center = new PVector(width/2, height/2);
   squished = new ArrayList<PVector>();
   active = new ArrayList<Bug>();
-  active.add(new Bug(roachImage));
-  active.add(new Bug(roachImage));
-  active.add(new Bug(roachImage));
-  active.add(new Bug(roachImage));
-  background(bgColor);
+  roach = loadImage(roachImage);
   blood = loadImage(bloodImage);
+  active.add(new Bug(roach));
+  active.add(new Bug(roach));
+  active.add(new Bug(roach));
+  active.add(new Bug(roach));
   imageMode(CENTER);
+  background(bgColor);
   frameRate(fps);
   cursor(CROSS);
 }
@@ -158,9 +161,15 @@ void mousePressed() {
     for (int i = 0; i < active.size (); i++) {
       if (active.get(i).hit()) {
         squished.add(new PVector(active.get(i).getX(), active.get(i).getY()));
-        //println("hit");
         active.remove(i);
       }
+    }
+    if (active.size() == 0) {
+      noLoop();
+      for (int i = (int)random(9); i < 10; i++) {
+        active.add(new Bug(roach));
+      }
+      loop();
     }
   }
 }
