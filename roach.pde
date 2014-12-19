@@ -16,12 +16,6 @@ Copyright (C) 2014 Birger Schulze
  
  */
 
-/*
- TODO:
- 
- */
-
-
 int scrWidth = 640;
 int scrHeight = 480;
 int scrDiag = 0;
@@ -107,7 +101,6 @@ class Bug {
   }
 
   void replace() {
-    //resetMatrix();
     xPos = random(width);
     yPos = random(height);
     direction = random(TWO_PI);
